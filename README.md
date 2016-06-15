@@ -1,2 +1,2 @@
 # vim_profile
-保存我Mac上的.vimrc文件
+保存我的.vimrc和.gvimrc文件
