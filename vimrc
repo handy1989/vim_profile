@@ -25,6 +25,7 @@ Plugin 'jlanzarotta/bufexplorer'
 Plugin 'vim-scripts/EasyGrep'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'mileszs/ack.vim'
+Plugin 'bronson/vim-visual-star-search'
 
 
 " All of your Plugins must be added before the following line
@@ -106,6 +107,8 @@ map <F4> :set nopaste<CR>
 nnoremap <leader>q :cw<CR>
 
 
+set background=dark
+colorscheme solarized
 " diff模式设置不同colors，防止对比色彩看不清
 if &diff  
     colors torte
@@ -117,6 +120,14 @@ endif
 let g:ycm_global_ycm_extra_conf = '$HOME/.ycm_extra_conf.py'
 let g:ycm_confirm_extra_conf=0
 let g:ycm_collect_identifiers_from_tag_files = 1
+let g:ycm_min_num_of_chars_for_completion=2 " 从第2个键入字符就开始罗列匹配项"
+let g:ycm_seed_identifiers_with_syntax = 1
+let g:ycm_key_invoke_completion = '<C-/>'
+let g:ycm_complete_in_comments = 1
+"在字符串输入中也能补全
+let g:ycm_complete_in_strings = 1
+"注释和字符串中的文字也会被收入补全
+let g:ycm_collect_identifiers_from_comments_and_strings = 0
 let g:ycm_error_symbol = '>>'
 let g:ycm_warning_symbol = '>*'
 nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
@@ -189,3 +200,9 @@ let g:bufExplorerSplitRight=0        " Split left.
 let g:bufExplorerSplitBelow=1        " Split new window below current.
 let g:bufExplorerHorzSize=20          " New split window is n rows high.
 autocmd BufWinEnter \[Buf\ List\] setl nonumber
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ack.vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:ack_default_options=" -s -H --nocolor --nogroup --column --cpp --cc"
