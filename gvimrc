@@ -19,7 +19,6 @@ endfunction
 function! NERDTree_IsValid()
     return 1
 endfunction
-nmap <C-m> :WMToggle<CR>
 
 set noimdisable
 autocmd! InsertLeave * set imdisable|set iminsert=0
