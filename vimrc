@@ -26,6 +26,9 @@ Plugin 'vim-scripts/EasyGrep'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'mileszs/ack.vim'
 Plugin 'bronson/vim-visual-star-search'
+Plugin 'godlygeek/tabular'
+Plugin 'plasticboy/vim-markdown'
+Plugin 'suan/vim-instant-markdown'
 
 
 " All of your Plugins must be added before the following line
@@ -117,7 +120,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " youcompleteme
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ycm_global_ycm_extra_conf = '$HOME/.ycm_extra_conf.py'
+let g:ycm_global_ycm_extra_conf = "$HOME/.ycm_extra_conf.py"
 let g:ycm_confirm_extra_conf=0
 let g:ycm_collect_identifiers_from_tag_files = 1
 let g:ycm_min_num_of_chars_for_completion=2 " 从第2个键入字符就开始罗列匹配项"
@@ -206,3 +209,15 @@ autocmd BufWinEnter \[Buf\ List\] setl nonumber
 " ack.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ack_default_options=" -s -H --nocolor --nogroup --column --cpp --cc"
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-instant-markdown
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 依赖node.js
+" sudo add-apt-repository ppa:chris-lea/node.js
+" sudo apt-get update
+" sudo apt-get install nodejs
+" sudo npm -g install instant-markdown-d
+let g:instant_markdown_autostart = 0
+map <C-m> :InstantMarkdownPreview<CR>
+"let g:instant_markdown_slow = 1
