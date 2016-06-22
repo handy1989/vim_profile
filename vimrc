@@ -108,7 +108,9 @@ map <C-n> :NERDTreeTabsToggle<CR>
 map <F3> :set paste<CR>
 map <F4> :set nopaste<CR>
 nnoremap <leader>q :cw<CR>
-
+map <2-leftmouse> <leader>m
+nnoremap <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
+map <ESC> <ESC>:MarkClear<CR>:noh<CR>
 
 set background=dark
 colorscheme solarized
@@ -136,6 +138,7 @@ let g:ycm_warning_symbol = '>*'
 nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
 nnoremap <leader>gf :YcmCompleter GoToDefinition<CR>
 nnoremap <leader>gg :YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <C-\> :YcmCompleter GoToDefinitionElseDeclaration<CR>
 nmap <F4> :YcmDiags<CR>
 
 
