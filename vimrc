@@ -17,7 +17,7 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'scrooloose/nerdtree'
 Plugin 'ervandew/supertab'
-Plugin 'vim-scripts/taglist.vim'
+Plugin 'handy1989/latest-taglist' " 最新版
 Plugin 'bling/vim-airline'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'tpope/vim-surround'
@@ -26,9 +26,11 @@ Plugin 'vim-scripts/EasyGrep'
 Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'mileszs/ack.vim'
 Plugin 'bronson/vim-visual-star-search'
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
-Plugin 'suan/vim-instant-markdown'
+Plugin 'nelstrom/vim-qargs' " 将quickfix文件列表加入args, 快捷键:Qargs
+Plugin 'Lokaltog/vim-powerline'
+"Plugin 'godlygeek/tabular'
+"Plugin 'plasticboy/vim-markdown'
+"Plugin 'suan/vim-instant-markdown'
 
 
 " All of your Plugins must be added before the following line
@@ -108,9 +110,8 @@ map <C-n> :NERDTreeTabsToggle<CR>
 map <F3> :set paste<CR>
 map <F4> :set nopaste<CR>
 nnoremap <leader>q :cw<CR>
-map <2-leftmouse> <leader>m
-nnoremap <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
-map <ESC> <ESC>:MarkClear<CR>:noh<CR>
+nnoremap <silent> <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
+map <silent> <F9> <ESC>:noh<CR>
 
 set background=dark
 colorscheme solarized
@@ -132,7 +133,7 @@ let g:ycm_complete_in_comments = 1
 "在字符串输入中也能补全
 let g:ycm_complete_in_strings = 1
 "注释和字符串中的文字也会被收入补全
-let g:ycm_collect_identifiers_from_comments_and_strings = 0
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
 let g:ycm_error_symbol = '>>'
 let g:ycm_warning_symbol = '>*'
 nnoremap <leader>gl :YcmCompleter GoToDeclaration<CR>
@@ -192,9 +193,11 @@ nmap <C-t> :TlistToggle<CR>
 " 2 - Track the current extension
 " 3 - User mode -- Use a custom, on demand set of extensions
 let EasyGrepMode=0
-let EasyGrepDefaultUserPattern="*.h *.cc *.cpp *.c *.hpp *.hxx"
+"let EasyGrepDefaultUserPattern="*.h *.cc *.cpp *.c *.hpp *.hxx"
 let EasyGrepCommand=1
 let EasyGrepJumpToMatch=0
+let EasyGrepSearchCurrentBufferDir=0
+let EasyGrepExtraWarnings=0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " bufexplorer
@@ -211,16 +214,6 @@ autocmd BufWinEnter \[Buf\ List\] setl nonumber
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ack.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
+set grepprg=ack\ -s\ -H\ --nocolor\ --nogroup\ --column\ --cpp\ --cc\ $*
 let g:ack_default_options=" -s -H --nocolor --nogroup --column --cpp --cc"
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-instant-markdown
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" 依赖node.js
-" sudo add-apt-repository ppa:chris-lea/node.js
-" sudo apt-get update
-" sudo apt-get install nodejs
-" sudo npm -g install instant-markdown-d
-let g:instant_markdown_autostart = 0
-map <C-m> :InstantMarkdownPreview<CR>
-"let g:instant_markdown_slow = 1
+nnoremap <F12> :Grep! <C-R>=expand("<cword>")<CR><CR>
