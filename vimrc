@@ -28,6 +28,7 @@ Plugin 'mileszs/ack.vim'
 Plugin 'bronson/vim-visual-star-search'
 Plugin 'nelstrom/vim-qargs' " 将quickfix文件列表加入args, 快捷键:Qargs
 Plugin 'Lokaltog/vim-powerline'
+Plugin 'vim-scripts/ZoomWin' " 最大化当前窗口<C-w>o, 再按一次恢复原来窗口
 "Plugin 'godlygeek/tabular'
 "Plugin 'plasticboy/vim-markdown'
 "Plugin 'suan/vim-instant-markdown'
@@ -112,6 +113,8 @@ map <F4> :set nopaste<CR>
 nnoremap <leader>q :cw<CR>
 nnoremap <silent> <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
 map <silent> <F9> <ESC>:noh<CR>
+nmap <F6> mM
+nmap <F7> 'M
 
 set background=dark
 colorscheme solarized
