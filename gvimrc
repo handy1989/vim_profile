@@ -11,8 +11,6 @@ let g:solarized_termtrans=1
 let g:solarized_contrast="normal"
 let g:solarized_visibility="normal"
 
-nmap <C-h> gT
-nmap <C-l> gt
 
 function! NERDTree_Start()
     exec 'NERDTree'

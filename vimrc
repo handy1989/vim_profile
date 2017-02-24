@@ -66,6 +66,7 @@ set softtabstop=4 " 每次退格删除4个空格
 set autoindent
 set cindent
 set hls
+set backspace=indent,eol,start
 "set mouse=a " 激活鼠标
 set number " 显示行号
 set wildmode=longest,list " Ex命令自动补全采用bash方式
@@ -97,24 +98,42 @@ augroup PreviewOnBottom
     autocmd InsertLeave * set splitbelow!
 augroup END
 
+" 跳转到文件上次退出的光标所在处
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
 " 快捷键
 " 键盘映射
 " 调整窗口大小
 " for example: vertival resize +10 
 let mapleader = ","
-map <C-v>s :vertical resize 
-map <C-s> :resize
-nmap <leader>nnu :set nonu<CR>
-nmap <leader>nu :set nu<CR>
-nmap <leader>w :cw<CR>
-map <C-n> :NERDTreeTabsToggle<CR>
-map <F3> :set paste<CR>
-map <F4> :set nopaste<CR>
+noremap <C-v>s :vertical resize 
+noremap <C-s> :resize
+nnoremap <leader>n :set number!<CR>
+nnoremap <leader>w :cw<CR>
+noremap <C-n> :NERDTreeTabsToggle<CR>
+noremap <leader>p :set paste!<CR>:set paste?<CR>
 nnoremap <leader>q :cw<CR>
-nnoremap <silent> <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
-map <silent> <F9> <ESC>:noh<CR>
-nmap <F6> mM
-nmap <F7> 'M
+"noremap <silent> <F8> :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
+noremap <silent> <F9> <ESC>:noh<CR>
+nnoremap <F6> mM
+nnoremap <F7> 'M
+nnoremap <c-h> :A<cr>
+
+" 高亮光标所在单词开关
+let g:last_cursor = [0,0,0,0]
+function! HighlightCursorWordToggle()
+    let cursor = getpos('.')
+    if cursor == g:last_cursor
+        set hls!
+    else
+        let @/='\<'.expand('<cword>').'\>'
+        set hls
+    endif
+    let g:last_cursor = cursor
+endfunction
+nnoremap <silent> <F8> :call HighlightCursorWordToggle()<cr>
 
 set background=dark
 colorscheme solarized
@@ -151,7 +170,7 @@ nmap <F4> :YcmDiags<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
+"let g:ctrlp_cmd = 'CtrlP'
 " <F5>清除缓存目录列表
 "let g:ctrlp_root_markers = ['.'] " 设置根目录，如果为设置，默认为上层最近的.git .hg .svn .bzr所在的目录
 "  c - the directory of the current file.
@@ -162,19 +181,57 @@ let g:ctrlp_cmd = 'CtrlP'
 "  w - begin finding a root from the current working directory outside of CtrlP
 "      instead of from the directory of the current file (default). Only applies
 "      when "r" is also present.
-let g:ctrlp_working_path_mode = "ra"
+let g:ctrlp_working_path_mode = "w"
 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:20,results:40'
+  "\ 'dir':  '\v([\/]\.(git|hg|svn))|CMakeFiles$',
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+  \ 'dir':  '\v([\/]\.(git|hg|svn))|CMakeFiles$',
   \ 'file': '\v\.(exe|so|dll|o|d|tar|gz)$',
   \ }
 "let g:ctrlp_user_command = 'find %s -type f' "添加这样代码后g:ctrlp_custom_ignore不生效
+" 查找剪贴板文件
+function! FindUnderCursor(type)
+    try
+        let default_input_save = get(g:, 'ctrlp_default_input', '')
+        let g:ctrlp_default_input = expand('<cword>')
+        if a:type == "file"
+            CtrlP
+        elseif a:type == "tag"
+            CtrlPTag
+        endif
+    finally
+        if exists('default_input_save')
+            let g:ctrlp_default_input = default_input_save
+        endif
+    endtry
+endfu
+nnoremap <leader>f :call FindUnderCursor("file")<cr>
+"nnoremap <leader>t :call FindUnderCursor("tag")<cr>
+" 搜索当前文件的tag，需要实现建立tags文件
+nnoremap @ :CtrlPBufTag<cr>
+
+" 遍历窗口，找到名字不为NERD_tree的窗口，并在该窗口执行ctrlp
+" 若窗口都为NERD_tree，则在靠右的窗口打开ctrlp
+function! CtrlPCommand()
+    let c = 0
+    let wincount = winnr('$')
+    while match(expand("%"), "NERD_tree") >= 0 && c < wincount
+        exec 'wincmd w'
+        let c = c + 1
+    endwhile
+    if c == wincount
+        exec 'wincmd l'
+    endif
+    exec 'CtrlP'
+endfunction
+let g:ctrlp_cmd = 'call CtrlPCommand()'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " nerdtree
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 map <C-n> :NERDTreeTabsToggle<CR>
-let NERDTreeIgnore=['\.o$', '\~$', '\.d$', '\.tar$', '\.gz$', '^core\.', '\.pyc$'] "过滤文件
+"过滤文件
+let NERDTreeIgnore=['\.o$', '\~$', '\.d$', '\.tar$', '\.gz$', '^core\.', '\.pyc$', '_debug_build$'] 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " taglist
@@ -217,6 +274,7 @@ autocmd BufWinEnter \[Buf\ List\] setl nonumber
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ack.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
-set grepprg=ack\ -s\ -H\ --nocolor\ --nogroup\ --column\ --cpp\ --cc\ $*
-let g:ack_default_options=" -s -H --nocolor --nogroup --column --cpp --cc"
-nnoremap <F12> :Grep! <C-R>=expand("<cword>")<CR><CR>
+set grepprg=ack\ -s\ -H\ --nocolor\ --nogroup\ --column\ $*
+let g:ack_default_options=" -s -H --nocolor --nogroup --column "
+nnoremap <F12> :Ack! -w --cpp --cc <C-R>=expand("<cword>")<CR><CR>
+nnoremap <F11> :Ack! -w --cpp --cc <C-R><C-W> <C-R>%<CR>
