@@ -111,6 +111,7 @@ let mapleader = ","
 noremap <C-v>s :vertical resize 
 noremap <C-s> :resize
 nnoremap <leader>n :set number!<CR>
+nnoremap <leader>h :set hls!<CR>
 nnoremap <leader>w :cw<CR>
 noremap <C-n> :NERDTreeTabsToggle<CR>
 noremap <leader>p :set paste!<CR>:set paste?<CR>
@@ -119,7 +120,7 @@ nnoremap <leader>q :cw<CR>
 noremap <silent> <F9> <ESC>:noh<CR>
 nnoremap <F6> mM
 nnoremap <F7> 'M
-nnoremap <c-h> :A<cr>
+nnoremap <leader>a :A<cr>
 
 " 高亮光标所在单词开关
 let g:last_cursor = [0,0,0,0]
@@ -215,9 +216,13 @@ nnoremap @ :CtrlPBufTag<cr>
 function! CtrlPCommand()
     let c = 0
     let wincount = winnr('$')
-    while match(expand("%"), "NERD_tree") >= 0 && c < wincount
-        exec 'wincmd w'
-        let c = c + 1
+    while c < wincount
+        if match(expand("%"), "NERD_tree") >= 0 || match(expand("%"), "__Tag_List__") >= 0
+            exec 'wincmd w'
+            let c = c + 1
+        else
+            break
+        endif
     endwhile
     if c == wincount
         exec 'wincmd l'
