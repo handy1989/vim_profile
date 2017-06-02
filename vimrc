@@ -11,7 +11,6 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'Valloric/YouCompleteMe'
 Plugin 'vim-scripts/a.vim'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'ctrlpvim/ctrlp.vim'
@@ -29,10 +28,11 @@ Plugin 'bronson/vim-visual-star-search'
 Plugin 'nelstrom/vim-qargs' " 将quickfix文件列表加入args, 快捷键:Qargs
 Plugin 'Lokaltog/vim-powerline'
 Plugin 'vim-scripts/ZoomWin' " 最大化当前窗口<C-w>o, 再按一次恢复原来窗口
-"Plugin 'godlygeek/tabular'
-"Plugin 'plasticboy/vim-markdown'
-"Plugin 'suan/vim-instant-markdown'
-
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'tomasr/molokai'
+Plugin 'nsf/gocode', {'rtp': 'vim/'}
+Plugin 'dgryski/vim-godef'
+Plugin 'majutsushi/tagbar'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -71,6 +71,11 @@ set backspace=indent,eol,start
 set number " 显示行号
 set wildmode=longest,list " Ex命令自动补全采用bash方式
 set incsearch " 在执行查找前预览第一处匹配
+
+nmap <silent> <C-k> :wincmd k<CR>
+nmap <silent> <C-j> :wincmd j<CR>
+nmap <silent> <C-h> :wincmd h<CR>
+nmap <silent> <C-l> :wincmd l<CR>
 
 " 打开关闭quifkfix
 function! ToggleQuickFix()
@@ -119,7 +124,11 @@ nnoremap <leader>q :cw<CR>
 noremap <silent> <F9> <ESC>:noh<CR>
 nnoremap <F6> mM
 nnoremap <F7> 'M
-nnoremap <c-h> :A<cr>
+nnoremap <silent> <leader>a :A<cr>
+nnoremap <leader>vs :vertival resize 
+nnoremap <leader>h :noh<cr>
+"nnoremap <silent> <leader>T :silent exec "!(ctags.sh . &) >/dev/null"<cr>
+nnoremap <silent> <leader>T :!ctags.sh . &<cr>
 
 " 高亮光标所在单词开关
 let g:last_cursor = [0,0,0,0]
@@ -135,12 +144,13 @@ function! HighlightCursorWordToggle()
 endfunction
 nnoremap <silent> <F8> :call HighlightCursorWordToggle()<cr>
 
+"let g:molokai_original = 1
 set background=dark
 colorscheme solarized
 " diff模式设置不同colors，防止对比色彩看不清
-if &diff  
-    colors torte
-endif
+"if &diff  
+"    colors torte
+"endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " youcompleteme
@@ -209,13 +219,14 @@ nnoremap <leader>f :call FindUnderCursor("file")<cr>
 "nnoremap <leader>t :call FindUnderCursor("tag")<cr>
 " 搜索当前文件的tag，需要实现建立tags文件
 nnoremap @ :CtrlPBufTag<cr>
+nnoremap <leader>t :CtrlPTag<cr>
 
 " 遍历窗口，找到名字不为NERD_tree的窗口，并在该窗口执行ctrlp
 " 若窗口都为NERD_tree，则在靠右的窗口打开ctrlp
 function! CtrlPCommand()
     let c = 0
     let wincount = winnr('$')
-    while match(expand("%"), "NERD_tree") >= 0 && c < wincount
+    while match(expand("%"), "NERD") >= 0 && c < wincount
         exec 'wincmd w'
         let c = c + 1
     endwhile
@@ -274,7 +285,118 @@ autocmd BufWinEnter \[Buf\ List\] setl nonumber
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ack.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! SearchProj(type)
+    let search_pattern = expand('<cword>')
+    let cur_file = expand('%')
+    if a:type == "file"
+        if cur_file =~ "\.go$"
+            exec 'Ack! -w --go '.search_pattern.' '.cur_file
+        elseif cur_file =~ "\.h$" || cur_file =~ "\.cpp$" || cur_file =~ "\.c$"
+            exec 'Ack! -w --cpp --cc '.search_pattern.' '.cur_file
+        else
+            exec 'Ack! -w '.search_pattern.' '.cur_file
+        endif
+    elseif a:type == "dir"
+        if cur_file =~ "\.go$"
+            exec 'Ack! -w --go '.search_pattern
+        elseif cur_file =~ "\.h$" || cur_file =~ "\.cpp$" || cur_file =~ "\.c$"
+            exec 'Ack! -w --cpp --cc '.search_pattern
+        else
+            exec 'Ack! -w '.search_pattern
+        endif
+    endif
+endfun()
+
 set grepprg=ack\ -s\ -H\ --nocolor\ --nogroup\ --column\ $*
 let g:ack_default_options=" -s -H --nocolor --nogroup --column "
-nnoremap <F12> :Ack! -w --cpp --cc <C-R>=expand("<cword>")<CR><CR>
-nnoremap <F11> :Ack! -w --cpp --cc <C-R><C-W> <C-R>%<CR>
+"nnoremap <F12> :Ack! -w --cpp --cc <C-R>=expand("<cword>")<CR><CR>
+"nnoremap <F11> :Ack! -w --cpp --cc <C-R><C-W> <C-R>%<CR>
+nnoremap <F12> :call SearchProj("dir")<cr>
+nnoremap <F11> :call SearchProj("file")<cr>
+nnoremap <leader>/ :Ack! -w --cpp --cc 
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-easymotion
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 行级跳转
+map <Leader><leader>h <Plug>(easymotion-linebackward)
+map <Leader><leader>l <Plug>(easymotion-lineforward)
+nmap <leader><leader>s <Plug>(easymotion-s2)
+nmap <leader><leader>t <Plug>(easymotion-t2)
+map  <leader><leader>/ <Plug>(easymotion-sn)
+omap <leader><leader>/ <Plug>(easymotion-tn)
+
+"nnoremap <F6> :cd ../../build<bar>:make -j 24<bar>:cd -<cr>
+"nnoremap <F7> :cd ../../build<bar>:make install<bar>:cd -<cr>
+
+function! BuildCmakeProj(cmd)
+    if getfsize("CMakeLists.txt") <= 0
+        echo "CMakeListsx.txt not found in working directory!"
+        return 
+    endif
+    if a:cmd == "build"
+        if ! isdirectory("build")
+            call mkdir("build")
+        endif
+        cd build
+        silent exec "!cmake .. -DCMAKE_BUILD_TYPE=Debug"
+        make -j 16
+        cd -
+    elseif a:cmd == "install"
+        if ! isdirectory("build")
+            call mkdir("build")
+        endif
+        cd build
+        silent exec "!cmake .. -DCMAKE_BUILD_TYPE=Debug"
+        make -j 16
+        make install
+        cd -
+    elseif a:cmd == "clean"
+        cd build
+        make clean
+        cd -
+    elseif a:cmd == "rebuild"
+        call system("rm -rf build")
+        call mkdir("build")
+        cd build
+        silent exec "!cmake .. -DCMAKE_BUILD_TYPE=Debug"
+        make -j 16
+        cd -
+    endif
+endfu
+
+nnoremap <F6> :call BuildCmakeProj("build")<cr>
+nnoremap <F7> :call BuildCmakeProj("install")<cr>
+nnoremap <F9> :call BuildCmakeProj("clean")<cr>
+nnoremap <F10> :call BuildCmakeProj("rebuild")<cr>
+
+" go
+let g:tagbar_type_go = {
+	\ 'ctagstype' : 'go',
+	\ 'kinds'     : [
+		\ 'p:package',
+		\ 'i:imports:1',
+		\ 'c:constants',
+		\ 'v:variables',
+		\ 't:types',
+		\ 'n:interfaces',
+		\ 'w:fields',
+		\ 'e:embedded',
+		\ 'm:methods',
+		\ 'r:constructor',
+		\ 'f:functions'
+	\ ],
+	\ 'sro' : '.',
+	\ 'kind2scope' : {
+		\ 't' : 'ctype',
+		\ 'n' : 'ntype'
+	\ },
+	\ 'scope2kind' : {
+		\ 'ctype' : 't',
+		\ 'ntype' : 'n'
+	\ },
+	\ 'ctagsbin'  : 'gotags',
+	\ 'ctagsargs' : '-sort -silent'
+\ }
+let g:godef_split=0
