@@ -30,9 +30,10 @@ Plugin 'Lokaltog/vim-powerline'
 Plugin 'vim-scripts/ZoomWin' " 最大化当前窗口<C-w>o, 再按一次恢复原来窗口
 Plugin 'Lokaltog/vim-easymotion'
 Plugin 'tomasr/molokai'
-Plugin 'nsf/gocode', {'rtp': 'vim/'}
+"Plugin 'nsf/gocode', {'rtp': 'vim/'}
 Plugin 'dgryski/vim-godef'
 Plugin 'majutsushi/tagbar'
+Plugin 'fatih/vim-go'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -199,6 +200,7 @@ let g:ctrlp_custom_ignore = {
   \ 'file': '\v\.(exe|so|dll|o|d|tar|gz)$',
   \ }
 "let g:ctrlp_user_command = 'find %s -type f' "添加这样代码后g:ctrlp_custom_ignore不生效
+let g:ctrlp_user_command = 'find -L %s -type f  -not -path "*/.*" -not -path "*/.*" -not -path "*CMakeFiles*" | grep -Ev "\.(exe|so|dll|o|d|tar|gz)$"'
 " 查找剪贴板文件
 function! FindUnderCursor(type)
     try
@@ -308,7 +310,7 @@ function! SearchProj(type)
 endfun()
 
 set grepprg=ack\ -s\ -H\ --nocolor\ --nogroup\ --column\ $*
-let g:ack_default_options=" -s -H --nocolor --nogroup --column "
+let g:ack_default_options=" -s -H --nocolor --nogroup --column --follow"
 "nnoremap <F12> :Ack! -w --cpp --cc <C-R>=expand("<cword>")<CR><CR>
 "nnoremap <F11> :Ack! -w --cpp --cc <C-R><C-W> <C-R>%<CR>
 nnoremap <F12> :call SearchProj("dir")<cr>
@@ -400,3 +402,32 @@ let g:tagbar_type_go = {
 	\ 'ctagsargs' : '-sort -silent'
 \ }
 let g:godef_split=0
+
+" vim-go custom mappings
+au FileType go nmap <Leader>s <Plug>(go-implements)
+au FileType go nmap <Leader>i <Plug>(go-info)
+au FileType go nmap <Leader>gd <Plug>(go-doc)
+au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
+au FileType go nmap <leader>r <Plug>(go-run)
+au FileType go nmap <leader>b <Plug>(go-build)
+au FileType go nmap <leader>t <Plug>(go-test)
+au FileType go nmap <leader>c <Plug>(go-coverage)
+au FileType go nmap <Leader>ds <Plug>(go-def-split)
+au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
+au FileType go nmap <Leader>dt <Plug>(go-def-tab)
+au FileType go nmap <Leader>e <Plug>(go-rename)
+
+" vim-go settings
+let g:go_fmt_command = "goimports"
+
+function! ToggleMouse()
+    " check if mouse is enabled
+    if &mouse == 'a'
+        " disable mouse
+        set mouse=
+    else
+        " enable mouse everywhere
+        set mouse=a
+    endif
+endfunc
+nnoremap <leader>m :call ToggleMouse()<cr>
